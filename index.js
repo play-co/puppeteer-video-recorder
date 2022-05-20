@@ -33,7 +33,6 @@ class PuppeteerVideoRecorder {
     
     async stop () {
     	await this.screenshots.stop();
-    	return this.createVideo();
     }
 
     get defaultFFMpegCommand() {
@@ -43,6 +42,7 @@ class PuppeteerVideoRecorder {
             '-f concat',
             '-safe 0',
             `-i ${imagesFilename}`,
+            '-inputdict={\`-framerate\':str(' + this.config.frameRate + ')}',
             '-framerate ' + this.config.frameRate,
             videoFilename
         ].join(' ');
@@ -50,11 +50,15 @@ class PuppeteerVideoRecorder {
 
     createVideo(ffmpegCommand = '') {
         const _ffmpegCommand = ffmpegCommand || this.defaultFFMpegCommand;
-        exec(_ffmpegCommand, (error, stdout, stderr) => {
-            if (error) throw new Error(error);
-            console.log(stdout);
-            console.log(stderr);
-        });
+        return new Promise((resolve, reject) => {
+            exec(_ffmpegCommand, (error, stdout, stderr) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve([stdout, stderr]);
+            });
+        })
     }
 }
 
