@@ -1,16 +1,22 @@
 const { FsHandler } = require('./handlers');
 const { exec } = require('child_process');
+const { resolve } = require('path');
 const PuppeteerMassScreenshots = require('puppeteer-mass-screenshots');
 
 class PuppeteerVideoRecorder {
-    constructor(){
+    config = {
+        frameRate: 60,
+        ffmpegPath: 'ffmpeg',
+    };
+    constructor(config){
+        this.config = Object.assign({}, this.config, config || {});
         this.screenshots = new PuppeteerMassScreenshots();
         this.fsHandler = new FsHandler();
     }
 
-    async init(page, outputFolder){
+    async init(page, outputFolder, ext){
         this.page = page;
-        this.outputFolder = outputFolder;
+        this.outputFolder = resolve(process.cwd(), outputFolder, ext);
         await this.fsHandler.init(outputFolder);
         const { imagesPath,imagesFilename, appendToFile } = this.fsHandler;
         await this.screenshots.init(page, imagesPath, {
@@ -30,11 +36,11 @@ class PuppeteerVideoRecorder {
     get defaultFFMpegCommand() {
         const { imagesFilename, videoFilename } = this.fsHandler;
         return [
-            'ffmpeg',
+            this.config.ffmpegPath,
             '-f concat',
             '-safe 0',
             `-i ${imagesFilename}`,
-            '-framerate 60',
+            '-framerate ' + this.config.frameRate,
             videoFilename
         ].join(' ');
     }
