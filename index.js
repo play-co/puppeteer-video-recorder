@@ -14,10 +14,13 @@ class PuppeteerVideoRecorder {
         this.fsHandler = new FsHandler();
     }
 
-    async init(page, outputFolder, ext){
+    async init(page, outputFolder, fileName){
+        if (!fileName) {
+            fileName = Date.now() + '.webm';
+        }
         this.page = page;
-        this.outputFolder = resolve(process.cwd(), outputFolder, ext);
-        await this.fsHandler.init(outputFolder);
+        this.outputFolder = resolve(process.cwd(), outputFolder);
+        await this.fsHandler.init(outputFolder, fileName);
         const { imagesPath,imagesFilename, appendToFile } = this.fsHandler;
         await this.screenshots.init(page, imagesPath, {
             afterWritingImageFile: (filename) => appendToFile(imagesFilename, `file '${filename}'\n`)
