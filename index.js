@@ -42,7 +42,7 @@ class PuppeteerVideoRecorder {
             '-f concat',
             '-safe 0',
             `-i ${imagesFilename}`,
-            '-inputdict={\'-framerate\':str(' + this.config.frameRate + ')}',
+            '-inputdict={\'-framerate\':' + this.config.frameRate + '}',
             '-framerate ' + this.config.frameRate,
             videoFilename
         ].join(' ');
