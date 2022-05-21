@@ -5,7 +5,8 @@ const PuppeteerMassScreenshots = require('puppeteer-mass-screenshots');
 
 class PuppeteerVideoRecorder {
     config = {
-        frameRate: 60,
+        inputFrameRate: 34,
+        outputFrameRate: 60,
         ffmpegPath: 'ffmpeg',
     };
     constructor(config){
@@ -39,12 +40,12 @@ class PuppeteerVideoRecorder {
         const { imagesFilename, videoFilename } = this.fsHandler;
         return [
             this.config.ffmpegPath,
+            `-r ${this.config.inputFrameRate}`,
             '-f concat',
             '-safe 0',
-            `-i ${imagesFilename}`,
-            '-inputdict={\'-framerate\':' + this.config.frameRate + '}',
-            '-framerate ' + this.config.frameRate,
-            videoFilename
+            `-i "${imagesFilename}"`,
+            `-vf fps=${this.config.frameRate}`,
+            `"${videoFilename}"`
         ].join(' ');
     }
 
