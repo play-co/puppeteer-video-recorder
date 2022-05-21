@@ -44,7 +44,7 @@ class PuppeteerVideoRecorder {
             '-f concat',
             '-safe 0',
             `-i "${imagesFilename}"`,
-            `-vf fps=${this.config.frameRate}`,
+            `-vf fps=${this.config.outputFrameRate}`,
             `"${videoFilename}"`
         ].join(' ');
     }
